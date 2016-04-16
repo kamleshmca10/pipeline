@@ -1,0 +1,38 @@
+- name: Check if docker is installed
+  stat:
+    path: /bin/docker
+  register: docker
+
+- name: Check if pip six is installed
+  stat:
+    path: /usr/lib/python2.7/site-packages/six*
+  register: six
+
+- name: Check if pip docker-py is installed
+  stat:
+    path: /usr/lib/python2.7/site-packages/docker_py*
+  register: dockerpy
+
+- name: install docker
+  yum:
+    name: docker
+    state: present
+  notify:
+    - start docker
+  when: docker.stat.exists == False
+  changed_when: no
+  ignore_errors: yes
+
+
+- name: create sysconfig file
+  template:
+    src: sysconfig.j2
+    dest: /etc/sysconfig/docker
+
+- name: Install six
+  pip: name=six
+  when: six.stat.exists == False
+
+- name: Install Docker-Py
+  pip: name=docker-py
+  when: dockerpy.stat.exists == False

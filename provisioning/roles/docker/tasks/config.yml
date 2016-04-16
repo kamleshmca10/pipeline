@@ -1,0 +1,4 @@
+- name: add docker main repository
+  template:
+    src: docker-main.repo.j2
+    dest: /etc/yum.repos.d/docker-main.repo

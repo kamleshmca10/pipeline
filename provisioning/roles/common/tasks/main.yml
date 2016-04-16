@@ -1,0 +1,32 @@
+---
+- name: Check if os packages are installed
+  stat:
+    path: /usr/bin/easy_install
+  register: os_packages
+
+- name: Check if pip is installed
+  stat:
+    path: /bin/pip
+  register: pip
+
+- name: Install os packages
+  yum: name={{item}} state=present
+  with_items:
+  - unzip
+  - bc
+  - net-tools
+  - nmap-ncat
+  - vim
+  - python-devel
+  - httplib2
+  - python-setuptools
+  when: os_packages.stat.exists == False
+
+
+- name: Download pip.
+  get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/tmp
+  when: pip.stat.exists == False
+
+- name: Install pip.
+  command: "python /tmp/get-pip.py"
+  when: pip.stat.exists == False
