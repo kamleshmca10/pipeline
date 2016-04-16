@@ -1,0 +1,107 @@
+- name: Check if httplib2 is installed
+  stat:
+    path: /usr/lib/python2.7/site-packages/httplib2
+  register: httplib2
+
+- name: Check if directories are present
+  stat:
+    path: /data/jenkins/
+  register: directories
+
+- name: Check if config.xml is present
+  stat:
+    path: /data/jenkins/config.xml
+  register: configxml
+
+- name: Check if plugins are present
+  stat:
+    path: /data/jenkins/plugins/workflow-multibranch.jpi
+  register: plugins
+
+- name: Install httplib2
+  pip: name=httplib2
+  when: os_packages.stat.exists == False
+
+
+- name: Directories are present
+  file:
+    path="{{ item }}"
+    state=directory
+    mode=0660
+  with_items: directories
+  tags: [jenkins]
+  when: directories.stat.exists == False
+
+- name: slave nodes are present
+  copy:
+    src='nodes'
+    dest='{{ jenkins_directory }}/'
+    mode=0660
+  tags: [jenkins]
+  when: directories.stat.exists == False
+
+- name: Config files are present
+  copy:
+    src='{{ item }}'
+    dest='{{ jenkins_directory }}/{{ item }}'
+    mode=0660
+  with_items: configs
+  tags: [jenkins]
+  when: configxml.stat.exists == False
+
+- name: Plugins are present
+  copy:
+    src='plugins'
+    dest='{{ jenkins_directory }}/plugins'
+  tags: [jenkins]
+  when: plugins.stat.exists == False
+
+#- name: Build job directories are present
+#  file:
+##    path='{{ jenkins_directory }}/jobs/{{ item }}'
+#    state=directory
+#    mode=0777
+#  with_items: jobs
+#  tags: [jenkins]
+
+#- name: Build jobs are present
+#  template:
+#    src=build.xml.j2
+#    dest='{{ jenkins_directory }}/jobs/{{ item }}/config.xml'
+#    mode=0777
+#    backup=yes
+#  with_items: jobs
+#  tags: [jenkins]
+
+#- name: Deployment job directories are present
+#  file:
+#    path='{{ jenkins_directory }}/jobs/{{ item }}-deployment'
+#    state=directory
+#    mode=0777
+#  with_items: jobs
+#  tags: [jenkins]
+#
+#- name: Deployment jobs are present
+#  template:
+#    src=deployment.xml.j2
+#    dest='{{ jenkins_directory }}/jobs/{{ item }}-deployment/config.xml'
+#    backup=yes
+#    mode=0777
+#  with_items: jobs
+#  tags: [jenkins]
+
+- name: Container is running
+  docker:
+    name=jenkins
+    image=jenkins
+    ports=8080:8080
+    volumes=/data/jenkins:/var/jenkins_home
+  tags: [jenkins]
+
+- name: Reload
+  uri:
+    url=http://192.168.50.10:8080/reload
+    method=POST
+    status_code=302
+  ignore_errors: yes
+  tags: [jenkins]

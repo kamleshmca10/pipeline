@@ -1,0 +1,14 @@
+---
+- hosts: all
+  remote_user: vagrant
+  roles:
+    - { role: common, become: yes, become_method: sudo }
+    - { role: docker, become: yes, become_method: sudo }
+
+- hosts: jenkinsmaster-01.example.com
+  roles:
+    - { role: jenkins, become: yes, become_method: sudo }
+
+- hosts: registry-01.example.com
+  roles:
+    - { role: registry, become: yes, become_method: sudo }
