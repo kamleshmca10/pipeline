@@ -13,22 +13,6 @@
     path: /usr/lib/python2.7/site-packages/docker_py*
   register: dockerpy
 
-- name: install docker
-  yum:
-    name: docker
-    state: present
-  notify:
-    - start docker
-  when: docker.stat.exists == False
-  changed_when: no
-  ignore_errors: yes
-
-
-- name: create sysconfig file
-  template:
-    src: sysconfig.j2
-    dest: /etc/sysconfig/docker
-
 - name: Install six
   pip: name=six
   when: six.stat.exists == False
@@ -36,3 +20,12 @@
 - name: Install Docker-Py
   pip: name=docker-py
   when: dockerpy.stat.exists == False
+
+- name: install updates
+  yum: update_cache=yes name=docker-engine state=latest disablerepo=extras,extras-source
+  notify:
+    - reload systemd
+    - start docker
+  when: docker.stat.exists == False
+  changed_when: no
+  ignore_errors: yes
