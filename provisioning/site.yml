@@ -8,6 +8,7 @@
 - hosts: jenkinsmaster-01.example.com
   roles:
     - { role: jenkins, become: yes, become_method: sudo }
+    - { role: netdata, become: yes, become_method: sudo }
 
 - hosts: registry-01.example.com
   roles:
