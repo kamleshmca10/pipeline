@@ -1,9 +1,4 @@
 ---
-- name: Check if os packages are installed
-  stat:
-    path: /usr/bin/easy_install
-  register: os_packages
-
 - name: Check if pip is installed
   stat:
     path: /bin/pip
@@ -12,6 +7,14 @@
 - name: Install os packages
   yum: name={{item}} state=present
   with_items:
+  - zlib-devel
+  - gcc
+  - make
+  - git
+  - autoconf
+  - autogen
+  - automake
+  - pkgconfig
   - unzip
   - bc
   - net-tools
@@ -19,7 +22,6 @@
   - vim
   - python-devel
   - python-setuptools
-  when: os_packages.stat.exists == False
 
 
 - name: Download pip.

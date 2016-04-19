@@ -20,7 +20,7 @@
 
 - name: Install httplib2
   pip: name=httplib2
-  when: os_packages.stat.exists == False
+  when: httplib2.stat.exists == False
 
 
 - name: Directories are present
@@ -64,6 +64,7 @@
     volumes: /data/jenkins:/var/jenkins_home
     state: started
   tags: [jenkins]
+  register: running_container
 
 - name: Reload
   uri:
@@ -72,3 +73,4 @@
     status_code=302
   ignore_errors: yes
   tags: [jenkins]
+  failed_when: running_container.rc == 1
