@@ -27,7 +27,7 @@
   file:
     path='{{ item }}'
     state=directory
-    mode=0775
+    mode=0777
   with_items: directories
   tags: [jenkins]
   when: directories.stat.exists == False
@@ -36,7 +36,7 @@
   copy:
     src='nodes'
     dest='{{ jenkins_directory }}/'
-    mode=0775
+    mode=0777
   tags: [jenkins]
   when: directories.stat.exists == False
 
@@ -61,16 +61,16 @@
   docker:
     image: jenkins
     ports: 8080:8080
-    volumes: /data/jenkins:/var/jenkins_home
+    volumes: /data/jenkins:/var/jenkins/
     state: started
   tags: [jenkins]
   register: running_container
 
 - name: Reload
   uri:
-    url=http://192.168.50.10:8080/reload
+    url=http://127.0.0.1:8080/reload
     method=POST
     status_code=302
   ignore_errors: yes
   tags: [jenkins]
-  failed_when: running_container.rc == 1
+  when: "'started 1 container' in running_container.msg"

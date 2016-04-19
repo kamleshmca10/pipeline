@@ -26,11 +26,12 @@ Vagrant.configure(2) do |config|
         config.vm.network :private_network, ip: ip
       end
 
-        # ansible provisioner
+       end
+       # ansible provisioner
         config.vm.provision :ansible do |ansible| 
           ansible.playbook = "provisioning/site.yml"
           ansible.sudo = true
         end
 
-      end
+
   end    
