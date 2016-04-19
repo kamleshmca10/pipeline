@@ -18,7 +18,6 @@
   - nmap-ncat
   - vim
   - python-devel
-  - httplib2
   - python-setuptools
   when: os_packages.stat.exists == False
 
@@ -30,3 +29,7 @@
 - name: Install pip.
   command: "python /tmp/get-pip.py"
   when: pip.stat.exists == False
+
+- name: install httplib2
+  pip:
+    name: httplib2
