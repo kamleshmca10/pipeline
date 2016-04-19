@@ -1,0 +1,25 @@
+---
+- name: Check if netdata is cloned from Git
+  stat:
+    path: /var/tmp/netdata
+  register: netdata
+
+- name: Create netdata dir
+  file:
+    path=/var/tmp/netdata
+    state=directory
+  when: netdata.stat.exists == False
+  
+- name: Clone netdata
+  git: repo=https://github.com/firehol/{{ item.repo }}.git
+       dest={{ item.dest }}
+       force=yes
+       recursive=no
+  with_items:
+    -
+      dest: "/var/tmp/netdata"
+      repo: netdata
+ 
+- name: Run Netdata
+  command: "cd /var/tmp/netdata && ./netdata-installer.sh"
+  when: netdata.stat.exists == False
