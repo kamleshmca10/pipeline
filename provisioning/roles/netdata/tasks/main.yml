@@ -1,14 +1,19 @@
 ---
-- name: Check if netdata is cloned from Git
+- name: Check if netdata dir exists
   stat:
     path: /var/tmp/netdata
-  register: netdata
+  register: netdata_dir
+
+- name: Check if netdata is cloned from Git
+  stat:
+    path: /var/tmp/netdata/netdata-installer.sh
+  register: netdata_git
 
 - name: Create netdata dir
   file:
     path=/var/tmp/netdata
     state=directory
-  when: netdata.stat.exists == False
+  when: netdata_dir.stat.exists == False
   
 - name: Clone netdata
   git: repo=https://github.com/firehol/{{ item.repo }}.git
@@ -19,7 +24,8 @@
     -
       dest: "/var/tmp/netdata"
       repo: netdata
+  when: netdata_git.stat.exists == False
  
 - name: Run Netdata
-  command: "cd /var/tmp/netdata && ./netdata-installer.sh"
-  when: netdata.stat.exists == False
+  command: "cd /var/tmp/netdata && ./netdata-installer.sh --install /data/ --dont-wait"
+  when: netdata_git.stat.exists == False

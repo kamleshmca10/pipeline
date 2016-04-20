@@ -11,8 +11,7 @@
   stat:
     path: /data/jenkins/slave.jar
   register: slavejar
-  when: jenkinsdir.stat.exists == False
-
+  #when: jenkinsdir.stat.exists == False
 
 - name: Directory is present
   file:
@@ -21,10 +20,10 @@
     mode=0770
   when: jenkinsdir.stat.exists == False
 
-
-- name: Download slave.jar file from master
-  get_url: url=http://192.168.50.10:8080/jnlpJars/slave.jar dest=/data/jenkins/slave.jar mode=0775
+- name: Download slavefile from master
+  get_url: url=http://192.168.50.10:8080/jnlpJars/slave.jar dest=/data/jenkins/ mode=0775
   when: slavejar.stat.exists == False
+  ignore_errors: True
 
 - name: Slave container is running
   docker:
@@ -32,3 +31,4 @@
     volumes: /data/jenkins:/var/jenkins/
     state: started
   register: running_container
+  ignore_errors: True

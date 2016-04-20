@@ -13,12 +13,6 @@
     path: /data/jenkins/config.xml
   register: configxml
 
-- name: Check if plugins are present
-  stat:
-    path: '{{ item }}'
-  with_items: plugins
-  register: plugins
-
 - name: Install httplib2
   pip: name=httplib2
   when: httplib2.stat.exists == False
@@ -55,7 +49,6 @@
     dest='{{ jenkins_directory }}/plugins'
     mode=0770
   tags: [jenkins]
-  when: plugins.stat.exists == False
 
 - name: Container is running
   docker:
