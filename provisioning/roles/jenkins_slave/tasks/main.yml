@@ -1,0 +1,34 @@
+# get slave jar from master
+# http://192.168.50.10:8080/jnlpJars/slave.jar
+# java -jar slave.jar -jnlpUrl http://yourserver:port/computer/slave-name/slave-agent.jnlp
+#
+- name: Check if directory is present
+  stat:
+    path: /data/jenkins
+  register: jenkinsdir
+
+- name: Check if jenkins slave file is present
+  stat:
+    path: /data/jenkins/slave.jar
+  register: slavejar
+  when: jenkinsdir.stat.exists == False
+
+
+- name: Directory is present
+  file:
+    path=/data/jenkins/
+    state=directory
+    mode=0770
+  when: jenkinsdir.stat.exists == False
+
+
+- name: Download slave.jar file from master
+  get_url: url=http://192.168.50.10:8080/jnlpJars/slave.jar dest=/data/jenkins/slave.jar mode=0775
+  when: slavejar.stat.exists == False
+
+- name: Slave container is running
+  docker:
+    image: sontags/centos7-jenkins-slave
+    volumes: /data/jenkins:/var/jenkins/
+    state: started
+  register: running_container
