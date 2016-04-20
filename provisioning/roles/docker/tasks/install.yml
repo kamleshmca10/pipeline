@@ -23,9 +23,16 @@
 
 - name: install updates
   yum: update_cache=yes name=docker-engine state=latest disablerepo=extras,extras-source
+  when: docker.stat.exists == False
+  ignore_errors: yes
+
+- name: Add docker.service
+  template:
+    src: docker.service.j2
+    dest: /usr/lib/systemd/system/docker.service
+    mode: 0644
+    owner: root
   notify:
     - reload systemd
     - start docker
-  when: docker.stat.exists == False
-  changed_when: no
   ignore_errors: yes
