@@ -2,7 +2,7 @@
 <slave>
   <name>jenkinsslave-01.example.com</name>
   <description></description>
-  <remoteFS>/data/jenkins/slaves/cd</remoteFS>
+  <remoteFS>/data/jenkins/slaves</remoteFS>
   <numExecutors>5</numExecutors>
   <mode>NORMAL</mode>
   <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>

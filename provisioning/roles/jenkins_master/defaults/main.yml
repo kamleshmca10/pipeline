@@ -1,14 +1,16 @@
 jenkins_directory: /data/jenkins
 
 directories:
+  - '{{ jenkins_directory }}'
   - '{{ jenkins_directory }}/plugins'
-  - '{{ jenkins_directory }}/slaves/cd'
+  - '{{ jenkins_directory }}/slaves/jenkinsslave-01.example.com'
   - /data/.ivy2
 
 configs:
   - config.xml
 
 plugins:
+  - docker-plugin.hpi
   - github.hpi
   - git.hpi
   - credentials.jpi
