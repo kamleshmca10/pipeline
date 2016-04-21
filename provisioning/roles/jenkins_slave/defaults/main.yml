@@ -1,0 +1,8 @@
+jenkins_directory: /data/jenkins
+
+directories:
+  - '{{ jenkins_directory }}'
+
+jenkins_master: 192.168.50.10
+jenkins_slave: jenkinsslave-01.example.com
+

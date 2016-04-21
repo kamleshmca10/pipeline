@@ -44,7 +44,7 @@
 - name: Container is running
   docker:
     image: jenkins
-    ports: 8080:8080
+    ports: ['8080:8080','50000:50000']
     volumes: /data/jenkins:/var/jenkins_home
     state: started
   register: running_container
