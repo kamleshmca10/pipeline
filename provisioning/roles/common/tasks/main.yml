@@ -22,6 +22,7 @@
   - vim
   - python-devel
   - python-setuptools
+  ignore_errors: true
 
 
 - name: Download pip.

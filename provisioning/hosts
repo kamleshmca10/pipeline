@@ -1,0 +1,5 @@
+[jenkinsmaster]
+ec2-52-58-142-19.eu-central-1.compute.amazonaws.com ansible_ssh_private_key_file=~/.ssh/myaws.pem
+[jenkinsslave]
+ec2-52-58-142-91.eu-central-1.compute.amazonaws.com ansible_ssh_private_key_file=~/.ssh/myaws.pem
+

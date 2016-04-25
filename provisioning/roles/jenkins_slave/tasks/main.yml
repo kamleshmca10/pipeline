@@ -1,6 +1,4 @@
 # get slave jar from master
-# curl -O http://192.168.50.10:8080/jnlpJars/slave.jar
-# java -jar slave.jar -jnlpUrl http://192.168.50.10:8080/computer/jenkinsslave-01.example.com/slave-agent.jnlp
 #
 - name: Check if directory is present
   stat:
@@ -20,13 +18,14 @@
   when: slavejar.stat.exists == False
 
 - name: Download slave.jar file from master
-  get_url: url='http://{{ jenkins_master }}:8080/jnlpJars/slave.jar' dest='{{ jenkins_directory }}/slave.jar' mode=0775
+  get_url: url='http://{{ groups.jenkinsmaster | join(" ") }}:8080/jnlpJars/slave.jar' dest='{{ jenkins_directory }}/slave.jar' mode=0775
   when: slavejar.stat.exists == False
+  ignore_errors: true
 
 - name: Slave container is running
   docker:
     image: sontags/centos7-jenkins-slave
     volumes: '{{ jenkins_directory }}:/var/jenkins'
     state: started
-    command: '/bin/bash java -jar /var/jenkins/slave.jar -jnlpUrl http://{{ jenkins_master }}:8080/computer/{{ jenkins_slave }}/slave-agent.jnlp'
+    command: '/bin/bash java -jar /var/jenkins/slave.jar -jnlpUrl http://{{ groups.jenkinsmaster | join(" ") }}:8080/computer/{{ groups.jenkinsslave | join(" ")}}/slave-agent.jnlp'
   register: running_container

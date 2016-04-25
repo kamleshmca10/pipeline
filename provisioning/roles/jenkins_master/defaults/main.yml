@@ -3,7 +3,7 @@ jenkins_directory: /data/jenkins
 directories:
   - '{{ jenkins_directory }}'
   - '{{ jenkins_directory }}/plugins'
-  - '{{ jenkins_directory }}/slaves/jenkinsslave-01.example.com'
+  - '{{ jenkins_directory }}/slaves/{{ groups.jenkinsslave | join(" ") }}'
   - /data/.ivy2
 
 configs:

@@ -17,14 +17,14 @@
     - /data
     - '{{ jenkins_directory }}'
     - '{{ jenkins_directory }}/plugins'
-    - '{{ jenkins_directory }}/slaves/jenkinsslave-01.example.com'
+    - '{{ jenkins_directory }}/slaves/{{ groups.jenkinsslave | join(" ") }}'
+    - '{{ jenkins_directory }}/nodes/{{ groups.jenkinsslave | join(" ") }}'
 
-- name: slave nodes are present
-  copy:
-    src='nodes'
-    dest='{{ jenkins_directory }}/'
-    mode=0777
-  when: directories.stat.exists == False
+- name: slave node config is present
+  template:
+    src='slaveconfig.xml.j2'
+    dest='{{ jenkins_directory }}/nodes/{{ groups.jenkinsslave | join(" ") }}/config.xml'
+  when: directories.stat.exists == True
 
 - name: Config files are present
   copy:
@@ -51,7 +51,7 @@
 
 - name: Reload
   uri:
-    url=http://127.0.0.1:8080/reload
+    url='http://{{ groups.jenkinsmaster | join(" ") }}:8080/reload'
     method=POST
     status_code=302
   ignore_errors: yes
