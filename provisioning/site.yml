@@ -1,21 +1,25 @@
 ---
 - hosts: all
+  connection: local
   remote_user: ec2-user
+  vars:
+    ansible_python_interpreter: "/usr/bin/env python"
+  gather_facts: True
   roles:
-    - { role: common, become: yes, become_method: sudo }
-    - { role: docker, become: yes, become_method: sudo }
+    - { role: common, become_method: sudo }
+    - { role: docker, become_method: sudo }
 
-- hosts: jenkinsmaster
+- hosts: tag_jenkins_master
   remote_user: ec2-user
   roles:
-    - { role: jenkins_master, become: yes, become_method: sudo }
-    - { role: netdata, become: yes, become_method: sudo }
+    - { role: jenkins_master, become_method: sudo, tags: ['jenkinsmaster'] }
+    - { role: netdata, become_method: sudo }
 
-- hosts: jenkinsslave
+- hosts: tag_jenkins_slave
   remote_user: ec2-user
   roles:
-    - { role: jenkins_slave, become: yes, become_method: sudo, tags: [ 'jenkinsslave' ]}
-    - { role: netdata, become: yes, become_method: sudo }
+    - { role: jenkins_slave, become_method: sudo, tags: [ 'jenkinsslave' ]}
+    - { role: netdata, become_method: sudo }
 
 - hosts: registry
   remote_user: ec2-user
