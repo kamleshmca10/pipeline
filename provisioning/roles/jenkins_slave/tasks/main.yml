@@ -18,14 +18,15 @@
   when: slavejar.stat.exists == False
 
 - name: Download slave.jar file from master
-  get_url: url='http://{{ groups.jenkinsmaster | join(" ") }}:8080/jnlpJars/slave.jar' dest='{{ jenkins_directory }}/slave.jar' mode=0775
+  get_url: url='http://{{ groups.tag_Name_jenkinsmaster | join(" ") }}:8080/jnlpJars/slave.jar' dest='{{ jenkins_directory }}/slave.jar' mode=0775
   when: slavejar.stat.exists == False
-  ignore_errors: true
+  ignore_errors: True
 
 - name: Slave container is running
   docker:
     image: sontags/centos7-jenkins-slave
     volumes: '{{ jenkins_directory }}:/var/jenkins'
     state: started
-    command: '/bin/bash java -jar /var/jenkins/slave.jar -jnlpUrl http://{{ groups.jenkinsmaster | join(" ") }}:8080/computer/{{ groups.jenkinsslave | join(" ")}}/slave-agent.jnlp'
+    command: '/bin/bash java -jar /var/jenkins/slave.jar -jnlpUrl http://{{ groups.tag_Name_jenkinsmaster | join(" ") }}:8080/computer/{{ groups.tag_Name_jenkinsslave | join(" ")}}/slave-agent.jnlp'
   register: running_container
+  ignore_errors: True

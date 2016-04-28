@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <slave>
-  <name>{{ groups.jenkinsslave | join(" ") }}</name>
+  <name>{{ groups.tag_Name_jenkinsslave | join(" ") }}</name>
   <description></description>
   <remoteFS>/var/jenkins_home/</remoteFS>
   <numExecutors>1</numExecutors>

@@ -19,20 +19,19 @@
     path='{{ item }}'
     state=directory
     mode=0777
-    owner=jenkins
-    group=jenkins
   with_items:
     - /data
     - '{{ jenkins_directory }}'
     - '{{ jenkins_directory }}/plugins'
-    - '{{ jenkins_directory }}/slaves/{{ groups.jenkinsslave | join(" ") }}'
-    - '{{ jenkins_directory }}/nodes/{{ groups.jenkinsslave | join(" ") }}'
+    - '{{ jenkins_directory }}/slaves/{{ groups.tag_Name_jenkinsslave | join(" ") }}'
+    - '{{ jenkins_directory }}/nodes/{{ groups.tag_Name_jenkinsslave | join(" ") }}'
 
 - name: slave node config is present
   template:
     src='slaveconfig.xml.j2'
-    dest='{{ jenkins_directory }}/nodes/{{ groups.jenkinsslave | join(" ") }}/config.xml'
+    dest='{{ jenkins_directory }}/nodes/{{ groups.tag_Name_jenkinsslave | join(" ") }}/config.xml'
     mode=0775
+  ignore_errors: True
 
 - name: Config files are present
   copy:
@@ -41,6 +40,7 @@
     mode=0777
   with_items: configs
   when: configxml.stat.exists == False
+  ignore_errors: True
 
 - name: Plugins are present
   copy:
@@ -48,6 +48,7 @@
     dest='{{ jenkins_directory }}/plugins/{{ item }}'
     mode=0777
   with_items: plugins
+  ignore_errors: True
 
 - name: Container is running
   docker:
@@ -58,9 +59,12 @@
   register: running_container
 
 - name: Reload jenkinsmaster
-  shell: 'curl --head --silent http://{{ groups.jenkinsmaster | join(" ") }}:8080/reload'
+  shell: 'curl --head --silent http://{{ groups.tag_Name_jenkinsmaster | join(" ") }}:8080/reload'
   register: result
   until: result.stdout.find("200 OK") != -1 
   retries: 12
   delay: 1
   when: "'started 1 container' in running_container.msg"
+  ignore_errors: True
+
+- debug: msg='{{ groups.tag_Name_jenkinsmaster }}'
