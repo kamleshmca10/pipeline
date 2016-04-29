@@ -2,12 +2,12 @@
   hosts: ec2
   connection: local
   vars:
-        ansible_python_interpreter: "/usr/bin/env python"
+        ansible_python_interpreter: '/usr/bin/env python'
   tasks:
     - name: Terminate {{ec2_id}} instance in {{ec2_region}} with hostname {{ ec2_public_dns_name }}
       local_action:
         module: ec2
-        key_name: "{{ ansible_env.HOME}}/.ssh/myaws.pem"
+        key_name: 'myaws'
         state: 'absent'
-        region: '{{ec2_region}}'
-        instance_ids: '{{ec2_id}}'
+        region: "{{ec2_region}}"
+        instance_ids: "{{ec2_id}}"
