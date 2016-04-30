@@ -62,7 +62,7 @@ initial setup-wizard - configuring plugins, users etc... on the first run.
 
  ## Dependencies
 
-  - java
+    - java
 
 ### Ansible Roles being used:
 
@@ -73,23 +73,23 @@ Installs Java on RHEL/CentOS server.
 
 ## Role Variables
 
-  java_packages: java-1.8.0-openjdk
+    java_packages: java-1.8.0-openjdk
 
 This variable will decide what version of java to install to your host
 
 
 ## Example Playbook
 
-- hosts: tag_jenkins_master
-  remote_user: ec2-user
-  vars:
-    java_packages: java-1.8.0-openjdk
-    jenkins_hostname: '{{ ec2_private_dns_name }}'
-    jenkins_admin_user: admin
-    jenkins_admin_email: admin@email.com
-    jenkins_do_initial: false
-    ansible_python_interpreter: "/usr/bin/env python"
-  gather_facts: True
-  roles:
-    - { role: java , become: yes, become_method: sudo }
-    - { role: jenkins, become: yes, become_method: sudo }
+    - hosts: tag_jenkins_master
+      remote_user: ec2-user
+      vars:
+        java_packages: java-1.8.0-openjdk
+        jenkins_hostname: '{{ ec2_private_dns_name }}'
+        jenkins_admin_user: admin
+        jenkins_admin_email: admin@email.com
+        jenkins_do_initial: false
+        ansible_python_interpreter: "/usr/bin/env python"
+      gather_facts: True
+      roles:
+        - { role: java , become: yes, become_method: sudo }
+        - { role: jenkins, become: yes, become_method: sudo }
