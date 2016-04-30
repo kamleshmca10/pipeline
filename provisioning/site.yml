@@ -4,6 +4,9 @@
   vars:
     java_packages: java-1.8.0-openjdk
     jenkins_hostname: '{{ ec2_private_dns_name }}'
+    jenkins_admin_user: admin
+    jenkins_admin_email: admin@email.com
+    jenkins_do_initial: false
     ansible_python_interpreter: "/usr/bin/env python"
   gather_facts: True
   roles:
