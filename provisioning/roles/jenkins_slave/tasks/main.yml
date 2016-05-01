@@ -17,6 +17,16 @@
   when: slavejar.stat.exists == False
   ignore_errors: True
 
+- name: create jenkins group
+  group: 
+    name: jenkins
+
+- name: create jenkins user
+  user: 
+    name: jenkins 
+    group: jenkins 
+    home: "{{ jenkins_home }}"
+
 - name: Download Swarm client 
   get_url:
     url: "http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/{{ jenkins_swarm_version }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
@@ -25,9 +35,7 @@
   ignore_errors: True
 
 - name: Run swarm client
-  command: "java -jar /opt/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar -master http://{{ jenkins_master }}:8080/" 
-  ignore_errors: True
-
-- name: Start the slave
-  command: "java -jar {{ jenkins_jar_location }} -jnlpUrl http://{{ jenkins_master }}:8080/computer/{{ jenkins_hostname }}/slave-agent.jnlp"
+  command: "java -jar /opt/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar -name {{ jenkins_hostname }} -description 'jenkins slave' -labels 'slave' -executors 1 -password admin -username admin -fsroot {{ jenkins_home }} -master http://{{ jenkins_master }}:8080 -disableSslVerification"
+  async: 45
+  poll: 0
   ignore_errors: True
