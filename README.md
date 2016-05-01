@@ -108,6 +108,11 @@ This boolean value will dictate whether or not you want jenkins 2.0 to run it's
 initial setup-wizard - configuring plugins, users etc... on the first run.
 
 
+    jenkins_plugins: []
+
+a list of plugins to be installed - this is currently not working in jenkins 2.0 due to jenkins CLI - see https://issues.jenkins-ci.org/browse/JENKINS-34287
+
+
  ## Dependencies
 
     - java

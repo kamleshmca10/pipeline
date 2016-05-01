@@ -1,8 +1,7 @@
-jenkins_directory: /data/jenkins
-
-directories:
-  - '{{ jenkins_directory }}'
-
-jenkins_master: '{{ groups.jenkinsmaster | join(" ") }}'
-jenkins_slave: '{{ groups.jenkinsslave | join(" ") }}'
+jenkins_hostname: localhost
+jenkins_swarm_version: 2.0
+jenkins_directory: /var/lib/jenkins
+jenkins_jar_location: /opt/jenkins-slave.jar
+jenkins_master: '{{ groups.tag_jenkins_master | join(" ") }}'
+jenkins_slave: '{{ groups.tag_jenkins_slave | join(" ") }}'
 

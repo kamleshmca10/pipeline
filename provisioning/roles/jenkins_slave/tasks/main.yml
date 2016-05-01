@@ -1,32 +1,33 @@
-# get slave jar from master
+#curl -O http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/2.0/swarm-client-2.0-jar-with-dependencies.jar
 #
-- name: Check if directory is present
-  stat:
-    path: '{{ jenkins_directory }}'
-  register: jenkinsdir
-
+#java -jar swarm-client-2.0-jar-with-dependencies.jar -master http://ip-172-31-24-161.eu-central-1.compute.internal:8080/ -username admin -password admin
+#
+#java -jar slave.jar -jnlpUrl http://ec2-52-29-124-160.eu-central-1.compute.amazonaws.com:8080/computer/ip-172-31-24-55.eu-central-1.compute.internal-e101a5ba/slave-agent.jnlp -secret 73c255f956c185a6423cee3c55ac5680e05c35a159efe343fcb336a1d5d30a87
+#
 - name: Check if jenkins slave file is present
   stat:
-    path: '{{ jenkins_directory }}/slave.jar'
+    path: "{{ jenkins_jar_location }}"
   register: slavejar
 
-- name: Directory is present
-  file:
-    path='{{ jenkins_directory }}'
-    state=directory
-    mode=0770
-  when: slavejar.stat.exists == False
-
 - name: Download slave.jar file from master
-  get_url: url='http://{{ groups.tag_Name_jenkinsmaster | join(" ") }}:8080/jnlpJars/slave.jar' dest='{{ jenkins_directory }}/slave.jar' mode=0775
+  get_url: 
+    url: "http://{{ jenkins_master }}:8080/jnlpJars/slave.jar" 
+    dest: "{{ jenkins_jar_location }}" 
+    mode: 0755
   when: slavejar.stat.exists == False
   ignore_errors: True
 
-- name: Slave container is running
-  docker:
-    image: sontags/centos7-jenkins-slave
-    volumes: '{{ jenkins_directory }}:/var/jenkins'
-    state: started
-    command: '/bin/bash java -jar /var/jenkins/slave.jar -jnlpUrl http://{{ groups.tag_Name_jenkinsmaster | join(" ") }}:8080/computer/{{ groups.tag_Name_jenkinsslave | join(" ")}}/slave-agent.jnlp'
-  register: running_container
+- name: Download Swarm client 
+  get_url:
+    url: "http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/{{ jenkins_swarm_version }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
+    dest: "/opt/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
+    mode: 0755
+  ignore_errors: True
+
+- name: Run swarm client
+  command: "java -jar /opt/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar -master http://{{ jenkins_master }}:8080/" 
+  ignore_errors: True
+
+- name: Start the slave
+  command: "java -jar {{ jenkins_jar_location }} -jnlpUrl http://{{ jenkins_master }}:8080/computer/{{ jenkins_hostname }}/slave-agent.jnlp"
   ignore_errors: True

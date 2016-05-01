@@ -12,3 +12,14 @@
   roles:
     - { role: java , become: yes, become_method: sudo }
     - { role: jenkins, become: yes, become_method: sudo }
+
+- hosts: tag_jenkins_slave
+  remote_user: ec2-user
+  vars:
+    java_packages: java-1.8.0-openjdk
+    jenkins_hostname: '{{ ec2_private_dns_name }}'
+    ansible_python_interpreter: "/usr/bin/env python"
+  gather_facts: True
+  roles:
+    - { role: java , become: yes, become_method: sudo }
+    - { role: jenkins_slave, become: yes, become_method: sudo, tags: jenkins_slave }
