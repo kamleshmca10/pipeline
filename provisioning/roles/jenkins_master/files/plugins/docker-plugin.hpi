@@ -1,9 +1,0 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
-<title>302 Found</title>
-</head><body>
-<h1>Found</h1>
-<p>The document has moved <a href="http://updates.jenkins.io/download/plugins/docker-plugin/0.16.0/docker-plugin.hpi">here</a>.</p>
-<hr>
-<address>Apache/2.2.14 (Ubuntu) Server at updates.jenkins-ci.org Port 443</address>
-</body></html>
