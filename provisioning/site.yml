@@ -10,7 +10,8 @@
     ansible_python_interpreter: "/usr/bin/env python"
   gather_facts: True
   roles:
-    - { role: java , become: yes, become_method: sudo }
+    - { role: common, become: yes, become_method: sudo }
+    - { role: java, become: yes, become_method: sudo }
     - { role: jenkins, become: yes, become_method: sudo }
 
 - hosts: tag_jenkins_slave
@@ -21,5 +22,6 @@
     ansible_python_interpreter: "/usr/bin/env python"
   gather_facts: True
   roles:
-    - { role: java , become: yes, become_method: sudo }
+    - { role: common, become: yes, become_method: sudo }
+    - { role: java, become: yes, become_method: sudo }
     - { role: jenkins_slave, become: yes, become_method: sudo, tags: jenkins_slave }
