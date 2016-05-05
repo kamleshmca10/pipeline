@@ -1,25 +1,7 @@
-#curl -O http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/2.0/swarm-client-2.0-jar-with-dependencies.jar
-#
-#java -jar swarm-client-2.0-jar-with-dependencies.jar -master http://ip-172-31-24-161.eu-central-1.compute.internal:8080/ -username admin -password admin
-#
-#java -jar slave.jar -jnlpUrl http://ec2-52-29-124-160.eu-central-1.compute.amazonaws.com:8080/computer/ip-172-31-24-55.eu-central-1.compute.internal-e101a5ba/slave-agent.jnlp -secret 73c255f956c185a6423cee3c55ac5680e05c35a159efe343fcb336a1d5d30a87
-#
 - name: Check if jenkins slave file is present
   stat:
     path: "{{ jenkins_jar_location }}"
   register: slavejar
-
-- name: Download slave.jar file from master
-  get_url: 
-    url: "http://{{ jenkins_master }}:8080/jnlpJars/slave.jar" 
-    dest: "{{ jenkins_jar_location }}" 
-    mode: 0755
-  when: slavejar.stat.exists == False
-  register: slave_download
-  until: "'Service Unavailable' not in slave_download.msg"
-  retries: 5
-  delay: 5
-  ignore_errors: True
 
 - name: create jenkins group
   group: 
@@ -46,19 +28,24 @@
     group: jenkins
   ignore_errors: True
 
+- name: Download slave.jar file from master
+  get_url: 
+    url: "http://{{ jenkins_master }}:8080/jnlpJars/slave.jar" 
+    dest: "{{ jenkins_jar_location }}" 
+    mode: 0755
+  when: slavejar.stat.exists == False
+  register: slave_download
+  until: "'Service Unavailable' not in slave_download.msg"
+  retries: 5
+  delay: 5
+  ignore_errors: True
+
 - name: Download Swarm client 
   get_url:
     url: "http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/{{ jenkins_swarm_version }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
-    dest: "/opt/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
+    dest: "{{ jenkins_home }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
     mode: 0755
   register: swarm_download
   until: "'Service Temporarily Unavailable' not in swarm_download.msg"
   retries: 5
   delay: 5
-  #  ignore_errors: True
-
-  #- name: Run swarm client
-  #command: "java -jar /opt/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar -name {{ jenkins_hostname }} -description 'jenkins slave' -labels 'slave' -executors 1 -password admin -username admin -fsroot {{ jenkins_home }} -master http://{{ jenkins_master }}:8080 -disableSslVerification"
-  #async: 45
-  #poll: 0
-  #ignore_errors: True

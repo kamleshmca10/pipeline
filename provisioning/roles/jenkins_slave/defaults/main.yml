@@ -2,7 +2,6 @@ jenkins_hostname: localhost
 jenkins_swarm_version: 2.0
 jenkins_directory: /var/lib/jenkins
 jenkins_home: /home/jenkins
-jenkins_jar_location: /opt/jenkins-slave.jar
+jenkins_jar_location: '{{ jenkins_home }}/slave.jar'
 jenkins_master: '{{ groups.tag_jenkins_master | join(" ") }}'
 jenkins_slave: '{{ groups.tag_jenkins_slave | join(" ") }}'
-
