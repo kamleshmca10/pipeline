@@ -22,8 +22,7 @@
   when: dockerpy.stat.exists == False
 
 - name: install updates
-  yum: update_cache=yes name=docker-engine state=latest 
-  register: docker_installed
+  yum: update_cache=yes name=docker-engine state=latest disablerepo=extras,extras-source
   when: docker.stat.exists == False
   ignore_errors: yes
 
