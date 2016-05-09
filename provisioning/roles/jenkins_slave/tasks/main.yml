@@ -1,60 +1,34 @@
+# get slave jar from master
+# http://192.168.50.10:8080/jnlpJars/slave.jar
+# java -jar slave.jar -jnlpUrl http://yourserver:port/computer/slave-name/slave-agent.jnlp
+#
+- name: Check if directory is present
+  stat:
+    path: /data/jenkins
+  register: jenkinsdir
+
 - name: Check if jenkins slave file is present
   stat:
-    path: "{{ jenkins_jar_location }}"
+    path: /data/jenkins/slave.jar
   register: slavejar
+  when: jenkinsdir.stat.exists == False
 
-- name: create jenkins group
-  group: 
-    name: jenkins
 
-- name: create jenkins user
-  user: 
-    name: jenkins 
-    group: jenkins 
-    home: "{{ jenkins_home }}"
-
-- name: create .ssh dir
+- name: Directory is present
   file:
-    path: "{{ jenkins_home }}/.ssh/"
-    state: directory
-    owner: jenkins
-    group: jenkins
+    path=/data/jenkins/
+    state=directory
+    mode=0770
+  when: jenkinsdir.stat.exists == False
 
-- name: Set ssh public key file if it exists
-  copy: 
-    content: "{{ hostvars[groups['tag_jenkins_master'][0]]['key_file'] }}" #['generated_key']['ssh_public_key'] }}"
-    dest: "{{ jenkins_home }}/.ssh/authorized_keys"
-    owner: jenkins
-    group: jenkins
-  ignore_errors: True
 
 - name: Download slave.jar file from master
-  get_url: 
-    url: "http://{{ jenkins_master }}:8080/jnlpJars/slave.jar" 
-    dest: "{{ jenkins_jar_location }}" 
-    mode: 0755
+  get_url: url=http://192.168.50.10:8080/jnlpJars/slave.jar dest=/data/jenkins/slave.jar mode=0775
   when: slavejar.stat.exists == False
-  register: slave_download
-  until: "'Service Unavailable' not in slave_download.msg"
-  retries: 5
-  delay: 5
-  ignore_errors: True
 
-- name: Download Swarm client 
-  get_url:
-    url: "http://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/{{ jenkins_swarm_version }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
-    dest: "{{ jenkins_home }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar"
-    mode: 0755
-  register: swarm_download
-  until: "'Service Temporarily Unavailable' not in swarm_download.msg"
-  retries: 5
-  delay: 5
-
-- name: Start swarm slave
-  shell: "/bin/java -jar {{ jenkins_home }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar -autoDiscoveryAddress {{ jenkins_master }} -executors 1 -fsroot {{ jenkins_home }} -labels slave -description jenkins_swarm_slave -retry 0 -showHostName"
-  args:
-    executable: /bin/bash
-  register: swarm_started
-  until: "'INFO: Connected' in swarm_started.stdout_lines or 'Retry limit reached, exiting...' in swarm_started.stdout_lines"
-  when: (swarm_download|succeeded or swarm_download|skipped)
-  ignore_errors: True
+- name: Slave container is running
+  docker:
+    image: sontags/centos7-jenkins-slave
+    volumes: /data/jenkins:/var/jenkins/
+    state: started
+  register: running_container
