@@ -49,3 +49,12 @@
   until: "'Service Temporarily Unavailable' not in swarm_download.msg"
   retries: 5
   delay: 5
+
+- name: Start swarm slave
+  shell: "/bin/java -jar {{ jenkins_home }}/swarm-client-{{ jenkins_swarm_version }}-jar-with-dependencies.jar -autoDiscoveryAddress {{ jenkins_master }} -executors 1 -fsroot {{ jenkins_home }} -labels slave -description jenkins_swarm_slave -retry 0 -showHostName"
+  args:
+    executable: /bin/bash
+  register: swarm_started
+  until: "'INFO: Connected' in swarm_started.stdout_lines or 'Retry limit reached, exiting...' in swarm_started.stdout_lines"
+  when: (swarm_download|succeeded or swarm_download|skipped)
+  ignore_errors: True
