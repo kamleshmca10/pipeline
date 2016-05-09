@@ -5,10 +5,23 @@
   register: pip
 
 - name: Install os packages
-  yum: name={{item}} state=latest
+  yum: name={{item}} state=present
   with_items:
-  - ['zlib-devel','gcc','make','git','golang','autoconf','autogen','automake','pkgconfig','unzip','bc','net-tools','nmap-ncat','vim','python-devel','python-setuptools']
-  ignore_errors: True
+  - zlib-devel
+  - gcc
+  - make
+  - git
+  - autoconf
+  - autogen
+  - automake
+  - pkgconfig
+  - unzip
+  - bc
+  - net-tools
+  - nmap-ncat
+  - vim
+  - python-devel
+  - python-setuptools
 
 
 - name: Download pip.

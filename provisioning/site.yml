@@ -1,27 +1,15 @@
 ---
-- hosts: tag_jenkins_master
-  remote_user: ec2-user
-  vars:
-    java_packages: java-1.8.0-openjdk
-    jenkins_hostname: '{{ ec2_private_dns_name }}'
-    jenkins_admin_user: admin
-    jenkins_admin_email: admin@email.com
-    jenkins_do_initial: false
-    ansible_python_interpreter: "/usr/bin/env python"
-  gather_facts: True
+- hosts: all
+  remote_user: vagrant
   roles:
     - { role: common, become: yes, become_method: sudo }
-    - { role: java, become: yes, become_method: sudo }
-    - { role: jenkins, become: yes, become_method: sudo }
+    - { role: docker, become: yes, become_method: sudo }
 
-- hosts: tag_jenkins_slave
-  remote_user: ec2-user
-  vars:
-    java_packages: java-1.8.0-openjdk
-    jenkins_hostname: '{{ ec2_private_dns_name }}'
-    ansible_python_interpreter: "/usr/bin/env python"
-  gather_facts: True
+- hosts: jenkinsmaster-01.example.com
   roles:
-    - { role: common, become: yes, become_method: sudo }
-    - { role: java, become: yes, become_method: sudo }
-    - { role: jenkins_slave, become: yes, become_method: sudo, tags: jenkins_slave }
+    - { role: jenkins, become: yes, become_method: sudo }
+    - { role: netdata, become: yes, become_method: sudo }
+
+- hosts: registry-01.example.com
+  roles:
+    - { role: registry, become: yes, become_method: sudo }
